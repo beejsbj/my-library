@@ -1,0 +1,145 @@
+# Exclude media folder (as requested)
+library/media/
+
+# Exclude data folder (contains databases and should not be in version control)
+library/data/
+
+# Exclude backups folder (backup files shouldn't be in git)
+backups/
+
+# Environment files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+*.log
+logs/
+library/*/logs/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# Next.js build output
+.next
+
+# Nuxt.js build / generate output
+.nuxt
+dist
+
+# Gatsby files
+.cache/
+public
+
+# Storybook build outputs
+.out
+.storybook-out
+
+# Temporary folders
+tmp/
+temp/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker volumes and temporary files
+.docker/
+docker-compose.override.yml
+
+# Cache directories
+.cache/
+cache/
+
+# Temporary download files
+*.tmp
+*.temp
+
+# Database files that shouldn't be tracked
+*.db
+*.sqlite
+*.sqlite3
+
+# MariaDB/MySQL specific files
+*.frm
+*.MAD
+*.MAI
+*.ibd
+*.CSM
+*.CSV
+
+# Application specific cache and temporary files
+library/configs/*/cache/
+library/configs/*/.cache/
+library/configs/*/tmp/
+library/configs/*/temp/
+library/configs/*/logs/
+library/configs/*/log/
+
+# qBittorrent specific files that change frequently
+library/configs/qbittorrent/qBittorrent/BT_backup/
+library/configs/qbittorrent/qBittorrent/GeoDB/
+library/configs/qbittorrent/qBittorrent/logs/
+library/configs/qbittorrent/qBittorrent/rss/articles/
+
+# Audiobookshelf cache and temporary files
+library/configs/audiobookshelf/cache/
+library/configs/audiobookshelf/logs/
+library/configs/audiobookshelf/streams/
+library/configs/audiobookshelf/backups/
+
+# Keep important config files but ignore dynamic data
+!library/configs/qbittorrent/qBittorrent/qBittorrent-data.conf
+!library/configs/*/config/
+!library/configs/*/settings/
