@@ -1,0 +1,120 @@
+services:
+  audiobookshelf:
+    image: 'ghcr.io/advplyr/audiobookshelf:latest'
+    container_name: audiobookshelf
+    volumes:
+      - '/mnt/HC_Volume_102773441/library/media/audiobooks:/audiobooks'
+      - '/mnt/HC_Volume_102773441/library/media/podcasts:/podcasts'
+      - '/mnt/HC_Volume_102773441/library/configs/audiobookshelf:/config'
+      - '/mnt/HC_Volume_102773441/library/data/audiobookshelf:/metadata'
+    environment:
+      - SERVICE_FQDN_AUDIOBOOKSHELF_80
+      - TZ=America/Toronto
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'wget --quiet --tries=1 --timeout=5 http://127.0.0.1:80/ping -O /dev/null || exit 1'
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+  booklore:
+    image: 'booklore/booklore:latest'
+    container_name: booklore
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - SERVICE_FQDN_BOOKLORE_6060
+      - 'DATABASE_URL=${DATABASE_URL:-jdbc:mariadb://mariadb-r04cgscs4cksww8w8k4g8kgc:3306/booklore}'
+      - DATABASE_USERNAME=booklore
+      - DATABASE_PASSWORD=bjbjbjbj
+      - SWAGGER_ENABLED=false
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    volumes:
+      - '/mnt/HC_Volume_102773441/library/data/booklore:/app/data'
+      - '/mnt/HC_Volume_102773441/library/media/books:/books'
+      - '/mnt/HC_Volume_102773441/library/downloads/ingest/books:/bookdrop'
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'wget --quiet --tries=1 --timeout=5 http://127.0.0.1:6060/ -O /dev/null || exit 1'
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+  mariadb:
+    image: 'lscr.io/linuxserver/mariadb:11.4.5'
+    container_name: mariadb
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+      - MYSQL_DATABASE=booklore
+      - MYSQL_USER=booklore
+      - MYSQL_ROOT_PASSWORD=bjbjbjbj
+      - MYSQL_PASSWORD=bjbjbjbj
+    volumes:
+      - '/mnt/HC_Volume_102773441/library/data/mariadb:/config'
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - mariadb-admin
+        - ping
+        - '-h'
+        - 127.0.0.1
+      interval: 5s
+      timeout: 5s
+      retries: 10
+  qbit:
+    image: 'lscr.io/linuxserver/qbittorrent:latest'
+    container_name: qbit
+    ports:
+      - "45000:45000/tcp"
+      - "45000:45000/udp"
+    environment:
+      - 'WEBUI_PORT=${WEBUI_PORT:-8080}'
+      - PUID=1000
+      - PGID=1000
+      - TZ=America/Toronto
+    volumes:
+      - '/mnt/HC_Volume_102773441/library/configs/qbittorrent:/config'
+      - '/mnt/HC_Volume_102773441/library/downloads:/downloads'
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - '-q'
+        - '--spider'
+        - 'http://127.0.0.1:8080/'
+      interval: 5s
+      timeout: 20s
+      retries: 10
+  vuetorrent-backend:
+    image: 'ghcr.io/vuetorrent/vuetorrent-backend:latest'
+    container_name: vuetorrent-backend
+    environment:
+      - SERVICE_FQDN_QBITORRENT_8080
+      - 'PORT=${WEBUI_PORT:-8080}'
+      - QBIT_BASE=http://qbit:${WEBUI_PORT:-8080}
+      - RELEASE_TYPE=stable
+      - UPDATE_VT_CRON="0 * * * *"
+    volumes:
+      - '/mnt/HC_Volume_102773441/library/configs/vuetorrent:/config'
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - '-q'
+        - '--spider'
+        - 'http://127.0.0.1:8080/'
+      interval: 5s
+      timeout: 20s
+      retries: 10
